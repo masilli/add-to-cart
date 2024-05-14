@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebas
 import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"
 
 const appSettings = {
-    databaseURL: "https://realtime-database-df319-default-rtdb.europe-west1.firebasedatabase.app/"
+    databaseURL: "https://realtime-database-59666-default-rtdb.europe-west1.firebasedatabase.app/"
 }
 
 const app = initializeApp(appSettings)
@@ -52,6 +52,7 @@ function appendItemToShoppingListEl(item) {
     let itemValue = item[1]
     
     let newEl = document.createElement("li")
+    newEl.setAttribute("tabindex", "0")
     
     newEl.textContent = itemValue
     
