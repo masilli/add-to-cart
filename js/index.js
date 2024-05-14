@@ -14,12 +14,28 @@ const addButtonEl = document.getElementById("add-button")
 const shoppingListEl = document.getElementById("shopping-list")
 
 addButtonEl.addEventListener("click", function() {
-    let inputValue = inputFieldEl.value
+    addItem();
+});
+
+inputFieldEl.addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        addItem();
+    }
+});
+
+function addItem() {
+    let inputValue = inputFieldEl.value;
     
-    push(shoppingListInDB, inputValue)
-    
-    clearInputFieldEl()
-})
+    if (inputValue !== "") {
+        push(shoppingListInDB, inputValue);
+        clearInputFieldEl();
+    } else {
+        inputFieldEl.value = "add product here";
+        setTimeout(function() {
+            inputFieldEl.value = "";
+        }, 500);
+    }
+}
 
 onValue(shoppingListInDB, function(snapshot) {
     if (snapshot.exists()) {
@@ -58,8 +74,10 @@ function appendItemToShoppingListEl(item) {
     
     newEl.addEventListener("click", function() {
         let exactLocationOfItemInDB = ref(database, `shoppingList/${itemID}`)
-        
-        remove(exactLocationOfItemInDB)
+        newEl.classList.add("deleted")
+        setTimeout(function() {
+            remove(exactLocationOfItemInDB)
+        }, 500)
     })
     
     shoppingListEl.append(newEl)

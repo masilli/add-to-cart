@@ -3,7 +3,7 @@
     "short_name": "add2Cart",
     "icons":
         [
-            {"src":"assets/shopping-cart-256x256.png","sizes":"256x256","type":"image/png"},{"src":"assets/shopping-cart-512x512.png","sizes":"512x512","type":"image/png"}
+            {"src":"assets/add2cart-icon-256x256.png","sizes":"256x256","type":"image/png"},{"src":"assets/add2cart-icon-512x512.png","sizes":"512x512","type":"image/png"}
         ],
     "theme_color": "#da6e1c",
     "background_color": "#da6e1c",
