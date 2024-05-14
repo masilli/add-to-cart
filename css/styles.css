@@ -3,8 +3,9 @@ html, body {
     padding: 0;
     font-family: monospace;
     background-color: #1e3050;
-    color: #2c1602;
+    color: #f8d65b;
     user-select: none;
+    text-align: center;
 }
 
 .container {
