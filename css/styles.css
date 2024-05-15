@@ -34,7 +34,7 @@ input {
 }
 
 input:focus {
-    box-shadow: inset 0 0 0 2px #87e3c0;
+    box-shadow: inset 0 0 0 4px #87e3c0;
 }
 
 button {
@@ -47,6 +47,14 @@ button {
     text-align: center;
     font-family: monospace;
     font-weight: bold;
+    transition: all ease .3s;
+}
+
+button span {
+    background: #1e3050;
+    color: #fff;
+    padding: .2em .5em;
+    border-radius:50%;
 }
 
 button:hover,
@@ -54,6 +62,12 @@ button:focus {
     background-color: #019c6b;
     color: #fff;
     cursor: pointer;
+}
+
+button:hover span,
+button:focus span {
+    background-color: #fff;
+    color: #1e3050;
 }
 
 ul {
@@ -85,7 +99,7 @@ ul li:active {
 
 .deleted {
     text-decoration: line-through;
-    animation: drop ease-out .5s;
+    animation: drop ease-out .75s;
 }
 
 @keyframes drop {
@@ -94,7 +108,7 @@ ul li:active {
     }
     100% {
         opacity:0;
-        translate: 0 200px;
-        transform: rotate(25deg);
+        translate: 0 250px;
+        transform: rotate(180deg);
     }
 }
