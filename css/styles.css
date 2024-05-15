@@ -73,6 +73,7 @@ ul li {
     flex-grow: 1;
     text-align: center;
     box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+    transition: all ease .3s;
 }
 
 ul li:hover,
@@ -84,5 +85,16 @@ ul li:active {
 
 .deleted {
     text-decoration: line-through;
-    opacity:.6;
+    animation: drop ease-out .5s;
+}
+
+@keyframes drop {
+    0% {
+        opacity:1;
+    }
+    100% {
+        opacity:0;
+        translate: 0 200px;
+        transform: rotate(25deg);
+    }
 }
