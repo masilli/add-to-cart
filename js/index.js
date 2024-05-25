@@ -23,12 +23,53 @@ inputFieldEl.addEventListener("keypress", function(event) {
     }
 });
 
+// function addItem() {
+//     let inputValue = inputFieldEl.value;
+    
+//     if (inputValue !== "") {
+//         let itemsArray = Object.values(shoppingListInDB);
+        
+//         if (itemsArray.includes(inputValue)) {
+//             inputFieldEl.value = "ERROR!";
+//         } else {
+//             push(shoppingListInDB, inputValue);
+//             clearInputFieldEl();
+//         }
+//     } else {
+//         inputFieldEl.value = "add product here"
+//         setTimeout(function() {
+//             inputFieldEl.value = ""
+//         }, 500);
+//     }
+// }
+
+// Function to add an item
 function addItem() {
-    let inputValue = inputFieldEl.value;
+    let inputValue = inputFieldEl.value.trim(); // Ensure the input is trimmed
     
     if (inputValue !== "") {
-        push(shoppingListInDB, inputValue);
-        clearInputFieldEl();
+        // Retrieve the current items from the database
+        onValue(shoppingListInDB, function(snapshot) {
+            if (snapshot.exists()) {
+                let itemsArray = Object.values(snapshot.val());
+                
+                // Check if the item already exists
+                if (itemsArray.includes(inputValue)) {
+                    inputFieldEl.value = "ERROR!!!";
+                    setTimeout(function() {
+                        inputFieldEl.value = "";
+                    }, 500);
+                } else {
+                    // Push the new item to the database
+                    push(shoppingListInDB, inputValue);
+                    clearInputFieldEl();
+                }
+            } else {
+                // No items in the database, add the new item
+                push(shoppingListInDB, inputValue);
+                clearInputFieldEl();
+            }
+        }, { onlyOnce: true }); // Listen for the value once
     } else {
         inputFieldEl.value = "add product here";
         setTimeout(function() {
