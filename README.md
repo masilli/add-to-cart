@@ -1,22 +1,39 @@
-# co097427c919a8af765b6a9ed
+# add-to-cart
 
-Quick start:
+Small demo app for a shopping list. Replaced Firebase with a server-side Neon (Postgres) connection via Netlify Functions.
 
+Quick start (local):
+
+```bash
+npm install
+npm run dev
 ```
-$ npm install
-$ npm start
-````
 
-Head over to https://vitejs.dev/ to learn more about using vite
-## About Scrimba
+Netlify function development (requires `netlify-cli`):
 
-At Scrimba our goal is to create the best possible coding school at the cost of a gym membership! 💜
-???
-If we succeed with this, it will give anyone who wants to become a software developer a realistic shot at succeeding, regardless of where they live and the size of their wallets 🎉
-The Frontend Developer Career Path aims to teach you everything you need to become a Junior Developer, or you could take a deep-dive with one of our advanced courses 🚀
+```bash
+npm install
+export NEON_CONNECTION_STRING="your-neon-connection-string"
+npm run dev:netlify
+```
 
-- [Our courses](https://scrimba.com/allcourses)
-- [The Frontend Career Path](https://scrimba.com/learn/frontend)
-- [Become a Scrimba Pro member](https://scrimba.com/pricing)
+Neon DB setup (Postgres):
 
-Happy Coding!
+1. In Neon console create a database and run this SQL to create the table:
+
+```sql
+CREATE TABLE shopping_list (
+	id SERIAL PRIMARY KEY,
+	item TEXT UNIQUE NOT NULL,
+	created_at TIMESTAMP DEFAULT now()
+);
+```
+
+2. Set `NEON_CONNECTION_STRING` (or `DATABASE_URL`) in Netlify Site > Site settings > Build & deploy > Environment variables.
+
+3. Deploy to Netlify. The site will call `/.netlify/functions/items` for CRUD.
+
+Notes:
+- The server enforces uniqueness and prevents exposing DB credentials to the client.
+- To test functions locally use `netlify dev` and set the same env var in your shell.
+

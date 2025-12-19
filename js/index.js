@@ -1,17 +1,10 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"
-import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"
-
-const appSettings = {
-    databaseURL: "https://realtime-database-59666-default-rtdb.europe-west1.firebasedatabase.app/"
-}
-
-const app = initializeApp(appSettings)
-const database = getDatabase(app)
-const shoppingListInDB = ref(database, "shoppingList")
+// Using Netlify Function (server) instead of Firebase. The server handles DB access.
+const API_BASE = '/.netlify/functions/items'
 
 const inputFieldEl = document.getElementById("input-field")
 const addButtonEl = document.getElementById("add-button")
 const shoppingListEl = document.getElementById("shopping-list")
+const statusEl = document.getElementById('status')
 
 addButtonEl.addEventListener("click", function() {
     addItem();
@@ -44,57 +37,67 @@ inputFieldEl.addEventListener("keypress", function(event) {
 // }
 
 // Function to add an item
-function addItem() {
-    let inputValue = inputFieldEl.value.trim(); // Ensure the input is trimmed
-    
-    if (inputValue !== "") {
-        // Retrieve the current items from the database
-        onValue(shoppingListInDB, function(snapshot) {
-            if (snapshot.exists()) {
-                let itemsArray = Object.values(snapshot.val());
-                
-                // Check if the item already exists
-                if (itemsArray.includes(inputValue)) {
-                    inputFieldEl.value = "ERROR!!!";
-                    setTimeout(function() {
-                        inputFieldEl.value = "";
-                    }, 500);
-                } else {
-                    // Push the new item to the database
-                    push(shoppingListInDB, inputValue);
-                    clearInputFieldEl();
-                }
-            } else {
-                // No items in the database, add the new item
-                push(shoppingListInDB, inputValue);
-                clearInputFieldEl();
-            }
-        }, { onlyOnce: true }); // Listen for the value once
-    } else {
-        inputFieldEl.value = "add product here";
-        setTimeout(function() {
-            inputFieldEl.value = "";
-        }, 500);
+async function addItem() {
+    const inputValue = inputFieldEl.value.trim();
+    if (!inputValue) {
+        showStatus('Add a product name')
+        return
+    }
+
+    try {
+        const res = await fetch(API_BASE, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ item: inputValue })
+        })
+
+        if (res.status === 201) {
+            const newItem = await res.json()
+            appendItemToShoppingListEl([String(newItem.id), newItem.item])
+            clearInputFieldEl()
+        } else if (res.status === 409) {
+            showStatus('Item already exists')
+        } else {
+            showStatus('Server error')
+        }
+    } catch (err) {
+        console.error(err)
+        showStatus('Network error')
     }
 }
 
-onValue(shoppingListInDB, function(snapshot) {
-    if (snapshot.exists()) {
-        let itemsArray = Object.entries(snapshot.val())
-    
+function showStatus(message, timeout = 1200) {
+    if (!statusEl) return
+    statusEl.textContent = message
+    if (timeout) setTimeout(() => {
+        if (statusEl.textContent === message) statusEl.textContent = ''
+    }, timeout)
+}
+
+// Load items from server and render
+async function loadItems() {
+    try {
+        const res = await fetch(API_BASE)
+        if (!res.ok) throw new Error('Failed to load')
+        const items = await res.json()
+        if (!Array.isArray(items) || items.length === 0) {
+            shoppingListEl.innerHTML = 'Nothing to see here... add some products to the list!'
+            return
+        }
+
         clearShoppingListEl()
-        
-        for (let i = 0; i < itemsArray.length; i++) {
-            let currentItem = itemsArray[i]
-            let currentItemID = currentItem[0]
-            let currentItemValue = currentItem[1]
-            
-            appendItemToShoppingListEl(currentItem)
-        }    
-    } else {
-        shoppingListEl.innerHTML = "Nothing to see here... add some products to the list!"
+        for (const row of items) {
+            // row: { id, item }
+            appendItemToShoppingListEl([String(row.id), row.item])
+        }
+    } catch (err) {
+        console.error(err)
+        shoppingListEl.innerHTML = 'Unable to load items.'
     }
-})
+}
+
+// Initial load
+loadItems()
 
 function clearShoppingListEl() {
     shoppingListEl.innerHTML = ""
@@ -110,16 +113,18 @@ function appendItemToShoppingListEl(item) {
     
     let newEl = document.createElement("li")
     newEl.setAttribute("tabindex", "0")
-    
     newEl.textContent = itemValue
-    
-    newEl.addEventListener("click", function() {
-        let exactLocationOfItemInDB = ref(database, `shoppingList/${itemID}`)
+
+    newEl.addEventListener("click", async function() {
         newEl.classList.add("deleted")
-        setTimeout(function() {
-            remove(exactLocationOfItemInDB)
-        }, 500)
+        try {
+            await fetch(`${API_BASE}?id=${encodeURIComponent(itemID)}`, { method: 'DELETE' })
+            setTimeout(() => newEl.remove(), 500)
+        } catch (err) {
+            console.error(err)
+            newEl.classList.remove('deleted')
+        }
     })
-    
+
     shoppingListEl.append(newEl)
 }

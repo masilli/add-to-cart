@@ -37,6 +37,21 @@ input:focus {
     box-shadow: inset 0 0 0 4px #87e3c0;
 }
 
+.visually-hidden {
+    position: absolute !important;
+    height: 1px; width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+}
+
+.status {
+    min-height: 1.2em;
+    margin-bottom: 8px;
+    color: #f8d65b;
+    font-size: 14px;
+}
+
 button {
     color: #1e3050;
     background-color: #66e0a7;

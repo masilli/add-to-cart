@@ -1,12 +1,17 @@
 {
-  "name": "project",
-  "dependencies": {},
+  "name": "add-to-cart",
+  "version": "1.0.0",
+  "dependencies": {
+    "pg": "^8.10.0"
+  },
   "devDependencies": {
-    "vite": "latest"
+    "vite": "latest",
+    "netlify-cli": "^12.0.0"
   },
   "scripts": {
     "start": "vite",
     "dev": "vite",
+    "dev:netlify": "netlify dev",
     "build": "vite build",
     "preview": "vite preview"
   }
