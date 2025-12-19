@@ -14,6 +14,18 @@ function getPool() {
 exports.handler = async (event) => {
   const pool = getPool()
   try {
+    // Basic API secret protection: if API_SECRET is set in environment,
+    // require clients to send it in the `x-api-key` header for mutating requests.
+    const needsAuth = ['POST', 'DELETE']
+    if (needsAuth.includes(event.httpMethod)) {
+      const apiSecret = process.env.API_SECRET
+      if (apiSecret) {
+        const provided = (event.headers && (event.headers['x-api-key'] || event.headers['X-API-KEY'])) || ''
+        if (provided !== apiSecret) {
+          return { statusCode: 401, body: 'Unauthorized' }
+        }
+      }
+    }
     if (event.httpMethod === 'GET') {
       const res = await pool.query('SELECT id, item FROM shopping_list ORDER BY created_at DESC')
       return { statusCode: 200, body: JSON.stringify(res.rows) }
