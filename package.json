@@ -1,6 +1,9 @@
 {
   "name": "add-to-cart",
   "version": "1.0.0",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "dependencies": {
     "pg": "^8.10.0"
   },
